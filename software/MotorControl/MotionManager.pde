@@ -25,6 +25,7 @@ class MotionManager
 
 	void startMotions()
 	{
+		if (paused) return;
 		arduino.attachMotor();
 		arduino.servoUp();
 		sequence.play();
@@ -42,7 +43,6 @@ class MotionManager
 		if (paused) return;
 		paused=true;
 		sequence.pause();
-		arduino.servoUp();
 		arduino.detachMotor();
 	}
 
@@ -52,6 +52,12 @@ class MotionManager
 		paused= false;
 		sequence.resume();
 		arduino.attachMotor();
+	}
+
+	void togglePause()
+	{
+		if (paused) resumeMotions();
+		else pauseMotions();
 	}
 
 
