@@ -2,7 +2,10 @@ import g4p_controls.*;
 
 ArduinoController ardu;
 MotionManager mm;
+Display display;
 ListSelectDialog ld;
+PFont font;
+
 public final int MICROSTEPS = 5000;
 public final int BINS = 200;
 public final boolean ONE_DIVISIONS= false;
@@ -12,6 +15,8 @@ public final boolean TWO_DIVISIONS= !ONE_DIVISIONS;
 void setup() {
 	createGUI();
 	selectPort();
+
+	font = loadFont("arial.vlw");
 }
 
 void settings() {
@@ -21,6 +26,8 @@ void settings() {
 
 void draw() {
 	background(230);
+
+	if (mm==null) return;
 }
 
 
@@ -28,7 +35,7 @@ void draw() {
 
 
 void init(String serialPort) {
-	ardu = new ArduinoController(this, serialPort, BINS, MICROSTEPS, TWO_DIVISIONS);
+	ardu = new ArduinoController(this, serialPort, BINS, MICROSTEPS, ONE_DIVISIONS);
 }
 
 void fileSelected(File selection) {
@@ -53,7 +60,9 @@ void keyPressed() {
 
 	if (key == 's' || key=='S')  mm.startMotions();
 	else if (key == 'x' || key=='X')  mm.stopMotions();
-	else if (key == 'l' || key=='L')  ardu.stepOnceLeft();
+	else if (key == 'x' || key=='X')  mm.stopMotions();
+	else if (key == 'p' || key=='P')  mm.pauseMotions();
+	else if (key == 'c' || key=='C')  mm.resumeMotions();
 	else if (key == 'r' || key=='R')  ardu.stepOnceRight();
 	else if (key == 'u' || key=='U')  ardu.servoUp();
 	else if (key == 'd' || key=='D')  ardu.servoDown();

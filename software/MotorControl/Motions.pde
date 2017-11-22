@@ -79,6 +79,8 @@ class ActionSequence implements Observer {
 	ArrayList<Action> q;
 	int current;
 	boolean isDone;
+	int totalInstructions;
+	Thread currentAction;
 
 	ActionSequence() {
 		q = new ArrayList<Action>();
@@ -90,11 +92,17 @@ class ActionSequence implements Observer {
 		if (m == null) return;
 		q.add (m);
 		m.addObserver(this);
+		totalInstructions++;
 	}
 
-	int size()
+	int getInstructionsLeft()
 	{
-		return q.size();
+		return totalInstructions;
+	}
+
+	int getTotalInstructions()
+	{
+		return totalInstructions;
 	}
 
 	void stop()
@@ -102,17 +110,35 @@ class ActionSequence implements Observer {
 		q.clear();
 	}
 
+	void pause()
+	{
+		if (currentAction==null) return;
+		currentAction.suspend();
+	}
+
+	void resume()
+	{
+		if (currentAction==null) return;
+		currentAction.resume();	
+	}
+
 	void play() {
 		current=0;
 		isDone= false;
-		(new Thread(q.get(current++))).start();
+		currentAction= new Thread(q.get(current++));
+		currentAction.start();
+		totalInstructions--;
 	}
 
 
 	public void update (Observable obs, Object obj) {
 		if (current < q.size())
-			(new Thread(q.get(current++))).start();
+		{
+			currentAction= new Thread(q.get(current++));
+			currentAction.start();
+		}
 		else isDone= true;
+		totalInstructions--;
 	}
 
 	public boolean isDone() {

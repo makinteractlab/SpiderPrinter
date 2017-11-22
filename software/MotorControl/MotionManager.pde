@@ -2,7 +2,9 @@ class MotionManager
 {
 	private ArduinoController arduino;
 	private ActionSequence sequence;
+	private Display display;
 	private int bins;
+	private boolean paused;
 
 	MotionManager (ArduinoController arduino, String inputFile, int totBins) 
 	{
@@ -10,9 +12,15 @@ class MotionManager
 		this.arduino= arduino;
 		sequence= new ActionSequence();
 		bins= totBins;
+		display= new Display(200, 600);
 
 		println(inputFile);
 		loadFile(inputFile);
+	}
+
+	String getInstructionsInfo()
+	{
+		return "Left: "+sequence.getInstructionsLeft();
 	}
 
 	void startMotions()
@@ -29,6 +37,24 @@ class MotionManager
 		arduino.detachMotor();
 	}
 
+	void pauseMotions()
+	{
+		if (paused) return;
+		paused=true;
+		sequence.pause();
+		arduino.servoUp();
+		arduino.detachMotor();
+	}
+
+	void resumeMotions()
+	{
+		if (!paused) return;
+		paused= false;
+		sequence.resume();
+		arduino.attachMotor();
+	}
+
+
 	private void loadFile (String inputFile)
 	{
 		String[] lines = loadStrings (inputFile);
@@ -44,6 +70,8 @@ class MotionManager
 			if(stepsLeft <= stepsRight) dir= Direction.LEFT;
 			int steps= min (stepsRight, stepsLeft);
 			addToSequence(sequence, dir, steps);
+
+			display.addLine (start, end);
 		}
 	}
 
@@ -51,7 +79,9 @@ class MotionManager
 	{
 		// println("Motion "+steps +" to " + dir);
 		seq.add(new PrintAction("Motion "+steps +" to " + dir));
-		seq.add(new RotationAction (ardu, steps, dir));
+		RotationAction r= new RotationAction (ardu, steps, dir);
+		seq.add(r);
+		display.observe(r);
 		seq.add (new ServoAction (ardu));
 		seq.add(new ActionPause (500));
 	}

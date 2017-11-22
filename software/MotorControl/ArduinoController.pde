@@ -16,7 +16,7 @@ class ArduinoController
 	public final int DIRECTION_PIN = 8;
 	public final int PULSE_PIN = 7;
 	public final int SERVO_PIN= 4;
-	public final int DEFAULT_DELAY= 20;
+	public final int DEFAULT_DELAY= 1;
 
 
 	ArduinoController (PApplet app, String portName, int bins, int microsteps, boolean twoDivisions)
@@ -32,7 +32,7 @@ class ArduinoController
 			servoUp();
 
 			setLeftDirection();
-			delayMs= 1 ; //DEFAULT_DELAY;
+			delayMs= DEFAULT_DELAY;
 
 			stepMultiplier= microsteps/bins;
 			if(twoDivisions) stepMultiplier*= 2;
@@ -57,7 +57,7 @@ class ArduinoController
 
 	void setSpeed(int ms)
 	{
-		//delayMs= ms;
+		delayMs= ms;
 	}
 
 	void setLeftDirection()
@@ -104,21 +104,36 @@ class ArduinoController
 		rotatePlatform (abs(steps));
 	}
 
-	void actuateServoToAngle (int angle)
+	void actuateServoToAngle (int fromAngle, int toAngle)
 	{
-		arduino.servoWrite(SERVO_PIN, angle);
+		//arduino.servoWrite(SERVO_PIN, angle);
+		// go to target angle in steps of 5
+		
+		int angle=5;
+		int steps= (int) abs((toAngle-fromAngle)/angle);
+
+		if (fromAngle>toAngle)
+		{
+			angle=-5;
+		}
+		for (int i=0; i<steps; i++)
+		{
+			arduino.servoWrite(SERVO_PIN, fromAngle+angle);
+			fromAngle+= angle;
+			waitms (100);
+		}
 	}
 
 	void servoUp()
 	{
 		servoState= ServoState.UP;
-		actuateServoToAngle(135);
+		actuateServoToAngle(70,130);
 	}
 
 	void servoDown()
 	{
 		servoState= ServoState.DOWN;
-		actuateServoToAngle(45);
+		actuateServoToAngle(130,70);
 	}
 
 	void toggleServo ()
