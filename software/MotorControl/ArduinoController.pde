@@ -15,8 +15,10 @@ class ArduinoController
 	public final int HOLDOFF_PIN = 9;
 	public final int DIRECTION_PIN = 8;
 	public final int PULSE_PIN = 7;
-	public final int SERVO_PIN= 4;
+	public final int SERVO_PIN= 6;
 	public final int DEFAULT_DELAY= 1;
+	public final int FAN_ONE= 12;
+	public final int FAN_TWO= 13;
 
 
 	ArduinoController (PApplet app, String portName, int bins, int microsteps, boolean twoDivisions)
@@ -27,6 +29,8 @@ class ArduinoController
 			arduino.pinMode(HOLDOFF_PIN, Arduino.OUTPUT);
 			arduino.pinMode(DIRECTION_PIN, Arduino.OUTPUT);
 			arduino.pinMode(PULSE_PIN, Arduino.OUTPUT);
+			arduino.pinMode(FAN_ONE, Arduino.OUTPUT);
+			arduino.pinMode(FAN_TWO, Arduino.OUTPUT);
 		
 			arduino.pinMode(SERVO_PIN, Arduino.SERVO);
 			servoUp();
@@ -43,6 +47,19 @@ class ArduinoController
 			println ("Port occupied");
 			System.exit(0);
 		}
+	}
+
+
+	void fanOn()
+	{
+		arduino.digitalWrite(FAN_ONE, Arduino.HIGH);
+		arduino.digitalWrite(FAN_TWO, Arduino.HIGH);
+	}
+
+	void fanOff()
+	{
+		arduino.digitalWrite(FAN_ONE, Arduino.LOW);
+		arduino.digitalWrite(FAN_TWO, Arduino.LOW);
 	}
 
 	void detachMotor()
@@ -127,13 +144,13 @@ class ArduinoController
 	void servoUp()
 	{
 		servoState= ServoState.UP;
-		actuateServoToAngle(70,130);
+		actuateServoToAngle(50,130);
 	}
 
 	void servoDown()
 	{
 		servoState= ServoState.DOWN;
-		actuateServoToAngle(130,70);
+		actuateServoToAngle(130,50);
 	}
 
 	void toggleServo ()

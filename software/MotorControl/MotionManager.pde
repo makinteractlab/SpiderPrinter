@@ -28,6 +28,7 @@ class MotionManager
 		if (paused) return;
 		arduino.attachMotor();
 		arduino.servoUp();
+		arduino.fanOn();
 		sequence.play();
 	}
 
@@ -35,6 +36,7 @@ class MotionManager
 	{
 		sequence.stop();
 		arduino.servoUp();
+		arduino.fanOff();
 		arduino.detachMotor();
 	}
 
